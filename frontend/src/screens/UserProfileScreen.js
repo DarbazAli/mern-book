@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Form, Image } from 'react-bootstrap'
 import axios from 'axios'
-import FormContainer from '../components/FormContainer'
+
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 
@@ -21,6 +21,7 @@ const UserProfileScreen = ({ history, match }) => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [showEditor, setShowEditor] = useState(false)
 
   const dispatch = useDispatch()
 
@@ -38,6 +39,7 @@ const UserProfileScreen = ({ history, match }) => {
   useEffect(() => {
     if (!userInfo) {
       history.push('/login')
+      return
     }
 
     if (success) {
@@ -81,22 +83,24 @@ const UserProfileScreen = ({ history, match }) => {
     }
   }
 
+  const handleShowEditor = () => setShowEditor(!showEditor)
+
   const submitHandler = (e) => {
     e.preventDefault()
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
     } else {
       dispatch(updateUserProfile(name, email, about, photo, password))
+      setShowEditor(false)
     }
   }
 
   return (
     <div>
-      <h1>Profile</h1>
       {loading && <Loader />}
       {error && <Message variant='danger'>{error}</Message>}
       {user && (
-        <>
+        <div className='text-center'>
           {user && (
             <Image
               src={user.photo}
@@ -105,21 +109,22 @@ const UserProfileScreen = ({ history, match }) => {
               style={{ width: '200px', height: '200px' }}
             />
           )}
-          <p>
-            <strong>Name: </strong>
-            {user && user.name}
-          </p>
-          <p>
-            <strong>Email: </strong>
-            {user && user.email}
-          </p>
-          <p>
-            <strong>About: </strong>
-            {user && user.about}
-          </p>
-        </>
+          <h3>{user && user.name}</h3>
+          <p>{user && user.email}</p>
+          <p>{user && user.about}</p>
+
+          <Button type='button' onClick={handleShowEditor}>
+            Edit Profile
+          </Button>
+        </div>
       )}
-      <FormContainer>
+      <div
+        className='my-5'
+        style={{
+          display: showEditor === true ? 'block' : 'none',
+          maxWidth: '500px',
+        }}
+      >
         <h1>Edit Profile</h1>
         {message && <Message variant='danger'>{message}</Message>}
         {success && <Message variant='success'>User updated</Message>}
@@ -196,7 +201,7 @@ const UserProfileScreen = ({ history, match }) => {
 
           <Button type='submit'>Update</Button>
         </Form>
-      </FormContainer>
+      </div>
     </div>
   )
 }
