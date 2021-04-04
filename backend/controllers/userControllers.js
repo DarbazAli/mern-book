@@ -47,13 +47,14 @@ Read single user
 ================================================================*/
 const read = async (req, res) => {
   const user = await User.findById(req.user.id)
-
+  console.log(user)
   if (user) {
     res.status(200).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       about: user.about,
+      photo: user.photo,
     })
   } else {
     res.status(404)
@@ -69,19 +70,23 @@ UPDATE USER PROFILE
 ================================================================*/
 const update = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
+
   if (user) {
     user.name = req.body.name || user.name
     user.email = req.body.email || user.email
     user.about = req.body.about || user.about
+    user.photo = req.body.photo || user.photo
     if (req.body.password) {
       user.password = req.body.password
     }
     const updatedUser = await user.save()
+
     res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
       about: updatedUser.about,
+      photo: updatedUser.photo,
       updatedAt: updatedUser.updatedAt,
       token: generateToken(updatedUser._id),
     })
@@ -166,6 +171,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       about: user.about,
+      photo: user.photo,
     })
   } else {
     res.status(404)

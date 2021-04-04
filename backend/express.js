@@ -1,15 +1,17 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import compress from 'compression'
-import cors from 'cors'
-import helmet from 'helmet'
+import path from 'path'
 import morgan from 'morgan'
 
 import { notFound, errorHandler } from './lib/errorMiddleware.js'
 
 import userRoutes from './routes/userRoutes.js'
+import uploadRoutes from './routes/uploadRoutes.js'
 
 const app = express()
+
+const __dirname = path.resolve()
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -26,6 +28,9 @@ app.get('/', (req, res) => {
 
 // user routes
 app.use('/api/users', userRoutes)
+app.use('/api/upload', uploadRoutes)
+
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
 /* Handling errors */
 app.use(notFound)

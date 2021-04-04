@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Form } from 'react-bootstrap'
-
+import { Button, Form, Image } from 'react-bootstrap'
+import axios from 'axios'
 import FormContainer from '../components/FormContainer'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
@@ -15,9 +15,12 @@ const UserProfileScreen = ({ history, match }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [about, setAbout] = useState('')
+  // const [image, setImage] = useState('')
+  const [photo, setPhoto] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   const dispatch = useDispatch()
 
@@ -43,6 +46,7 @@ const UserProfileScreen = ({ history, match }) => {
       setName(updatedUser.name)
       setEmail(updatedUser.email)
       setAbout(updatedUser.about)
+      setPhoto(updatedUser.photo)
     }
 
     if (!user.name) {
@@ -51,15 +55,38 @@ const UserProfileScreen = ({ history, match }) => {
       setName(user.name)
       setEmail(user.email)
       setAbout(user.about)
+      setPhoto(user.photo)
     }
   }, [history, userInfo, dispatch, user, success, userId, updatedUser])
+
+  const uploadFileHandler = async (e) => {
+    const file = e.target.files[0]
+    const formData = new FormData()
+    formData.append('image', file)
+    setUploading(true)
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+
+      const { data } = await axios.post('/api/upload', formData, config)
+      setPhoto(data)
+      setUploading(false)
+    } catch (error) {
+      console.error(error)
+      setUploading(false)
+    }
+  }
 
   const submitHandler = (e) => {
     e.preventDefault()
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
     } else {
-      dispatch(updateUserProfile(name, email, about, password))
+      dispatch(updateUserProfile(name, email, about, photo, password))
     }
   }
 
@@ -70,6 +97,14 @@ const UserProfileScreen = ({ history, match }) => {
       {error && <Message variant='danger'>{error}</Message>}
       {user && (
         <>
+          {user && (
+            <Image
+              src={user.photo}
+              fluid
+              rounded
+              style={{ width: '200px', height: '200px' }}
+            />
+          )}
           <p>
             <strong>Name: </strong>
             {user && user.name}
@@ -91,6 +126,23 @@ const UserProfileScreen = ({ history, match }) => {
         {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
         {loadingUpdate && <Loader />}
         <Form onSubmit={submitHandler}>
+          <Form.Group controlId='image'>
+            <Form.Label>Image</Form.Label>
+            <Form.Control
+              type='text'
+              placeholder='Enter image url'
+              value={photo}
+              onChange={(e) => setPhoto(e.target.value)}
+            ></Form.Control>
+            <Form.File
+              id='image-file'
+              label='Choose File'
+              custom
+              onChange={uploadFileHandler}
+            ></Form.File>
+            {uploading && <Loader />}
+          </Form.Group>
+
           <Form.Group controlId='name'>
             <Form.Label>Name</Form.Label>
             <Form.Control

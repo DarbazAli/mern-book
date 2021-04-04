@@ -150,10 +150,13 @@ export const getUserDetails = () => async (dispatch, getState) => {
     })
   }
 }
-export const updateUserProfile = (name, email, about, password) => async (
-  dispatch,
-  getState
-) => {
+export const updateUserProfile = (
+  name,
+  email,
+  about,
+  photo,
+  password
+) => async (dispatch, getState) => {
   try {
     dispatch({
       type: USER_UPDATE_PROFILE_REQUEST,
@@ -172,7 +175,7 @@ export const updateUserProfile = (name, email, about, password) => async (
 
     const { data } = await axios.put(
       `/api/users/profile`,
-      { name, email, about, password },
+      { name, email, about, photo, password },
       config
     )
 

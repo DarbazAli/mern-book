@@ -26,6 +26,10 @@ const userSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    photo: {
+      type: String,
+      default: '/uploads/default.jpeg',
+    },
   },
   { timestamps: true }
 )
