@@ -5,6 +5,13 @@ const router = express.Router()
 
 router.route('/').post(userCtrl.create).get(userCtrl.list)
 router
+  .route('/follow')
+  .put(protect, userCtrl.addFollowing, userCtrl.addFollower)
+router
+  .route('/unfollow')
+  .put(protect, userCtrl.removeFollowing, userCtrl.removeFollower)
+
+router
   .route('/profile')
   .get(protect, userCtrl.getUserProfile)
   .put(protect, userCtrl.update)

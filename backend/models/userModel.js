@@ -30,6 +30,18 @@ const userSchema = mongoose.Schema(
       type: String,
       default: '/uploads/default.jpeg',
     },
+    following: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
+    followers: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   { timestamps: true }
 )

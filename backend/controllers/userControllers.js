@@ -47,15 +47,12 @@ Read single user
 ================================================================*/
 const read = async (req, res) => {
   const user = await User.findById(req.user.id)
-  console.log(user)
+    .populate('following', '_id name')
+    .populate('followers', '_id name')
+    .exec()
+
   if (user) {
-    res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      about: user.about,
-      photo: user.photo,
-    })
+    res.status(200).json(user)
   } else {
     res.status(404)
     throw new Error('User not found')
@@ -178,14 +175,96 @@ const getUserProfile = asyncHandler(async (req, res) => {
     throw new Error('User not found')
   }
 })
+/*============================================================================
+@desc   Add new following
+@route  GET /api/users/follow
+@access Private
+=============================================================================*/
+const addFollowing = asyncHandler(async (req, res, next) => {
+  // find my profile, then add the followID to my follwing list
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    $push: { following: req.body.followId },
+  })
+
+  next()
+  if (!user) {
+    res.status(404)
+    throw new Error('User not found')
+  }
+})
+/*============================================================================
+@desc   Add new follwer
+@route  GET /api/users/follow
+@access Private
+=============================================================================*/
+const addFollower = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndUpdate(
+    req.body.followId,
+    { $push: { followers: req.user._id } },
+    { new: true }
+  )
+    .populate('following', '_id name')
+    .populate('follower', '_id name')
+    .exec()
+
+  user.password = undefined
+  res.json(user)
+  if (!user) {
+    res.status(404)
+    throw new Error('User not found')
+  }
+})
+
+/*============================================================================
+@desc   Add new following
+@route  GET /api/users/follow
+@access Private
+=============================================================================*/
+const removeFollowing = asyncHandler(async (req, res, next) => {
+  // find my profile, then remove the followID to my follwing list
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    $pull: { following: req.body.followId },
+  })
+
+  next()
+  if (!user) {
+    res.status(404)
+    throw new Error('User not found')
+  }
+})
+/*============================================================================
+@desc   remove new follwer
+@route  GET /api/users/follow
+@access Private
+=============================================================================*/
+const removeFollower = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndUpdate(
+    req.body.followId,
+    { $pull: { followers: req.user._id } },
+    { new: true }
+  )
+    .populate('following', '_id name')
+    .populate('follower', '_id name')
+    .exec()
+
+  user.password = undefined
+  res.json(user)
+  if (!user) {
+    res.status(404)
+    throw new Error('User not found')
+  }
+})
 
 export default {
   create,
   list,
-
   read,
   update,
   remove,
   authUser,
   getUserProfile,
+  addFollowing,
+  addFollower,
+  removeFollowing,
+  removeFollower,
 }
