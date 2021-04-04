@@ -13,7 +13,11 @@ const create = async (req, res) => {
   try {
     await user.save()
     return res.status(201).json({
-      message: 'Successfully signed up!',
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      about: user.about,
+      token: generateToken(user._id),
     })
   } catch (error) {
     return res.status(400).json({ error: error })
@@ -49,6 +53,7 @@ const read = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      about: user.about,
     })
   } else {
     res.status(404)
@@ -67,6 +72,7 @@ const update = asyncHandler(async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name
     user.email = req.body.email || user.email
+    user.about = req.body.about || user.about
     if (req.body.password) {
       user.password = req.body.password
     }
@@ -75,6 +81,7 @@ const update = asyncHandler(async (req, res) => {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
+      about: updatedUser.about,
       updatedAt: updatedUser.updatedAt,
       token: generateToken(updatedUser._id),
     })
@@ -134,6 +141,7 @@ const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      about: user.about,
       token: generateToken(user._id),
     })
   } else if (user && !(await user.matchPassword(password))) {
@@ -157,6 +165,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      about: user.about,
     })
   } else {
     res.status(404)

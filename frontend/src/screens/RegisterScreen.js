@@ -11,6 +11,7 @@ import { register } from '../actions/userActions'
 const RegisterScreen = ({ location, history }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [about, setAbout] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState(null)
@@ -35,7 +36,7 @@ const RegisterScreen = ({ location, history }) => {
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
     } else {
-      dispatch(register(name, email, password))
+      dispatch(register(name, email, about, password))
     }
   }
 
@@ -64,6 +65,17 @@ const RegisterScreen = ({ location, history }) => {
             placeholder='Enter Email'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          ></Form.Control>
+        </Form.Group>
+
+        <Form.Group controlId='about'>
+          <Form.Label>About</Form.Label>
+          <Form.Control
+            as='textarea'
+            row='2'
+            placeholder='A short description'
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
           ></Form.Control>
         </Form.Group>
 

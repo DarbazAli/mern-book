@@ -14,6 +14,7 @@ const UserProfileScreen = ({ history, match }) => {
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [about, setAbout] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState('')
@@ -41,6 +42,7 @@ const UserProfileScreen = ({ history, match }) => {
       dispatch(getUserDetails())
       setName(updatedUser.name)
       setEmail(updatedUser.email)
+      setAbout(updatedUser.about)
     }
 
     if (!user.name) {
@@ -48,6 +50,7 @@ const UserProfileScreen = ({ history, match }) => {
     } else {
       setName(user.name)
       setEmail(user.email)
+      setAbout(user.about)
     }
   }, [history, userInfo, dispatch, user, success, userId, updatedUser])
 
@@ -56,7 +59,7 @@ const UserProfileScreen = ({ history, match }) => {
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
     } else {
-      dispatch(updateUserProfile(name, email, password))
+      dispatch(updateUserProfile(name, email, about, password))
     }
   }
 
@@ -74,6 +77,10 @@ const UserProfileScreen = ({ history, match }) => {
           <p>
             <strong>Email: </strong>
             {user && user.email}
+          </p>
+          <p>
+            <strong>About: </strong>
+            {user && user.about}
           </p>
         </>
       )}
@@ -101,6 +108,17 @@ const UserProfileScreen = ({ history, match }) => {
               placeholder='Enter email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            ></Form.Control>
+          </Form.Group>
+
+          <Form.Group controlId='about'>
+            <Form.Label>About</Form.Label>
+            <Form.Control
+              as='textarea'
+              row='2'
+              placeholder='A short description'
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
             ></Form.Control>
           </Form.Group>
 
